@@ -2,7 +2,7 @@
 
 🔐 Simple, local-only Authy TOTP exporter and converter.
 
-A no-fluff, single-file workflow to export and decrypt your Authy TOTP tokens locally. Capture the Authy API response with `mitmweb`, save the JSON, then run `authy_exporter.py` and enter your Authy backup password to produce OTPAuth URLs and Bitwarden-compatible exports. Everything you need is in this README; the old `docs/` folder has been retired.
+A no-fluff, single-file workflow to export and decrypt your Authy TOTP tokens locally. Capture the Authy API response with `mitmweb`, save the JSON, then run `authy_exporter.py` and enter your Authy backup password to produce OTPAuth URLs and Bitwarden-compatible exports. Everything you need is in this README.
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![Python 3.7+](https://img.shields.io/badge/python-3.7%2B-blue.svg)](https://www.python.org/downloads/)
 
@@ -128,6 +128,11 @@ If the proxy does not load traffic, [click here](#mitmproxy-troubleshooting). If
 
   When trimmed, the URL should end with `apps=` (no app IDs). Paste that trimmed URL into your browser.
 
+   **Example trimmed request**
+   ```txt
+   https://api.authy.com/json/users/63351862/authenticator_tokens?locale=en&api_key={api_key_here}&otp2={otp_2_here}&otp3={otp_3_here}&device_id={device_id_here}&apps={list_of_app_ids}
+   ```
+
 If the trimmed URL returns HTML or redirects, [click here](#saving-json) for alternate download commands.
 
 ### 5) Save the encrypted tokens JSON
@@ -170,7 +175,7 @@ python authy_exporter.py
 2. Enter the backup password when prompted. The script decrypts the tokens and writes an export file such as `authenticator_tokens_export_bitwarden.json`, and prints `otpauth://` URLs you can copy.
 
 If you see `Decryption failed` or invalid data, [click here](#decryption-troubleshooting) for checks.
-See example commands for running the script in the "Script examples for noobs" section: [click here](#script-examples).
+See example commands for running the script in the "Script examples" section: [click here](#script-examples).
 
 ### 7) Import the data into Bitwarden or another TOTP manager, then clean up
 1. For Bitwarden bulk import: log into https://vault.bitwarden.com → **Settings → Tools → Import Data**, select **Bitwarden (json)**, and upload the exported JSON file.
@@ -181,7 +186,7 @@ See example commands for running the script in the "Script examples for noobs" s
 If Bitwarden rejects the JSON or shows errors, [click here](#bitwarden-import); for cleanup reminders revisit the Security Notes below.
 
 <a name="script-examples"></a>
-## Script examples for noobs
+## Script examples
 
 Use these copy-and-paste commands once you have `authenticator_tokens.json` and your backup password ready:
 
