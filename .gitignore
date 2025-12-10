@@ -1,0 +1,68 @@
+# Encrypted/exported token files (sensitive)
+authenticator_tokens.json
+bitwarden_import.json
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+authenticator_*
+
+venv/
+ENV/
+env/
+.env
+.env.*
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# IDEs and editors
+.idea/
+.vscode/
+*.sublime-workspace
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Databases
+*.sqlite3
+*.db
+
+# Secrets and certificates
+*.pem
+*.key
+*.crt
+secrets.json
+
+# Logs
+*.log
+
+# Misc
+*.bak
+*.swp
