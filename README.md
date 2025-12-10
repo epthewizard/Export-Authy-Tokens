@@ -8,6 +8,15 @@ A no-fluff, single-file workflow to export and decrypt your Authy TOTP tokens lo
 
 ## Quick Links
 
+- Credits: this guide was assembled with help from community projects such as `BrenoFariasdaSilva/Authy-iOS-MiTM` (see Credits & References below).
+
+> No jailbreak required: you do NOT need a jailbroken device. All you need is:
+
+- A computer (Windows/macOS/Linux) to run `mitmweb` and the Python decrypter script.
+- An iOS device with Authy installed and a created Authy backup password.
+- The mitmproxy certificate installed & trusted on the device (instructions below).
+- This README — full step-by-step instructions are provided below.
+
 - Step-by-step guide (this section)
 - Troubleshooting anchors (bottom of file)
 - Script usage (`python authy_exporter.py --help`)
