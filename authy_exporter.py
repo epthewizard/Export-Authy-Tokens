@@ -12,6 +12,7 @@ repository.
 
 import json
 import base64
+import binascii
 import argparse
 import sys
 import csv
@@ -24,7 +25,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 
 
-def decrypt_token(kdf_rounds, encrypted_seed_b64, salt, passphrase):
+def decrypt_token(kdf_rounds, encrypted_seed_b64, salt, iv, passphrase):
     """
     Decrypt a single TOTP token using PBKDF2 and AES-CBC
     """
@@ -40,8 +41,12 @@ def decrypt_token(kdf_rounds, encrypted_seed_b64, salt, passphrase):
         )
         key = kdf.derive(passphrase.encode())
         
-        # Use zero IV as per Authy's implementation
-        iv = bytes([0] * 16)
+        # AES with CBC mode
+        # Some versions of Authy used an IV, while others used a null IV. We account for both cases here.
+        if not iv:
+            iv = bytes([0] * 16)
+        else:
+            iv = binascii.unhexlify(iv)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
         
@@ -51,18 +56,13 @@ def decrypt_token(kdf_rounds, encrypted_seed_b64, salt, passphrase):
         padding_len = decrypted_data[-1]
         padding_start = len(decrypted_data) - padding_len
         
+        # Validate padding
         if padding_len > 16 or padding_start < 0:
             raise ValueError("Invalid padding length")
         if not all(pad == padding_len for pad in decrypted_data[padding_start:]):
             raise ValueError("Invalid padding bytes")
         
-        decrypted_seed_bytes = decrypted_data[:padding_start]
-        
-        # Try to decode as ASCII first, fall back to base32
-        try:
-            return decrypted_seed_bytes.decode('ascii')
-        except UnicodeDecodeError:
-            return base64.b32encode(decrypted_seed_bytes).decode('ascii').rstrip('=')
+        return decrypted_data[:padding_start].decode('utf-8')
         
     except Exception as e:
         return f"ERROR: {str(e)}"
@@ -79,12 +79,14 @@ def generate_totp_url(name, issuer, seed, digits=6):
 def export_bitwarden(tokens_data, output_file):
     bitwarden_items = []
     for token in tokens_data:
+        # Generate OTPAuth URL like convert.py for Vaultwarden compatibility
+        totp_url = generate_totp_url(token["name"], token.get("issuer"), token["decrypted_seed"], token.get("digits", 6))
         item = {
             "type": 1,
             "name": token["name"],
             "login": {
-                "username": token.get("issuer") or "",
-                "totp": token["decrypted_seed"]
+                "username": token["name"],
+                "totp": totp_url
             },
             "notes": f"Imported from Authy - ID: {token.get('unique_id', 'N/A')}"
         }
@@ -221,7 +223,7 @@ def process_authenticator_data(input_file, backup_password, export_format="bitwa
                     print(f"⚠️  Token #{idx} missing fields: {', '.join(missing_fields)}")
                     failed_tokens.append({"name": token.get("name", f"Token #{idx}"), "error": f"Missing fields: {', '.join(missing_fields)}"})
                     continue
-                decrypted_seed = decrypt_token(kdf_rounds=token['key_derivation_iterations'], encrypted_seed_b64=token['encrypted_seed'], salt=token['salt'], passphrase=backup_password)
+                decrypted_seed = decrypt_token(kdf_rounds=token['key_derivation_iterations'], encrypted_seed_b64=token['encrypted_seed'], salt=token['salt'], iv=token.get('unique_iv'), passphrase=backup_password)
                 if decrypted_seed.startswith("ERROR:"):
                     failed_tokens.append({"name": token.get("name", f"Token #{idx}"), "error": decrypted_seed})
                     print(f"❌ {token.get('name', f'Token #{idx}')}: {decrypted_seed}")
