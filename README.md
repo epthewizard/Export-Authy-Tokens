@@ -139,7 +139,7 @@ If the proxy does not load traffic, [click here](#mitmproxy-troubleshooting). If
 
    **Example trimmed request**
    ```txt
-   https://api.authy.com/json/users/63351862/authenticator_tokens?locale=en&api_key={api_key_here}&otp2={otp_2_here}&otp3={otp_3_here}&device_id={device_id_here}&apps={list_of_app_ids}
+   https://api.authy.com/json/users/63351862/authenticator_tokens?locale=en&api_key={api_key_here}&otp2={otp_2_here}&otp3={otp_3_here}&device_id={device_id_here}&apps=
    ```
 
 If the trimmed URL returns HTML or redirects, [click here](#saving-json) for alternate download commands.
@@ -191,6 +191,8 @@ See example commands for running the script in the "Script examples" section: [c
 2. Alternatively, open the export, copy the `decrypted_seed` for a specific account, and paste it into that login item under **Authenticator Key (TOTP)**.
 3. After importing, delete `authenticator_tokens.json`, the export file, stop `mitmweb` (`Ctrl+C`), and remove the HTTP proxy configuration from your iPhone Wi-Fi settings.
 4. Uninstall the mitmproxy profile: Settings → General → VPN & Device Management → mitmproxy → Delete Profile, then disable the trust toggle under Certificate Trust Settings.
+
+### Thats it! You can delete the JSON file now or save it to decrypt again in the future. It requires your backup password so the file itself is relatively safe to keep around and I cant guarantee this will continue to work forever.
 
 If Bitwarden rejects the JSON or shows errors, [click here](#bitwarden-import); for cleanup reminders revisit the Security Notes below.
 
